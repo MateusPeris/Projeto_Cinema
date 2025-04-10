@@ -22,7 +22,7 @@
 
     <main>
         <br>
-        <h1 style="text-align: center;">Cadastrar Sessões</h1>
+        <h1 style="text-align: center;">Sessões</h1>
         <hr>
         
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Cadastrar Sessão</button>
@@ -37,7 +37,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="form-sessao">
                             <div class="form-group">
                                 <label for="nome-filme" class="col-form-label">Filme:</label>
                                 <select class="form-control" name="nome-filme" id="nome-filme" required>
@@ -85,11 +85,163 @@
                 </div>
             </div>
         </div>
+
+        <hr>
+
+        <br>
+<h3>Sessões Cadastradas</h3>
+<table class="table table-bordered table-striped" id="tabela-sessoes">
+  <thead class="thead-dark">
+    <tr>
+      <th>ID</th>
+      <th>Filme</th>
+      <th>Sala</th>
+      <th>Data/Hora</th>
+      <th>Preço</th>
+      <th>Idioma</th>
+      <th>Formato</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
     </main>
 
     <footer></footer>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  </body>
+    
+    <script>
+        let idSessaoEdicao = null;
+      
+        function carregarFilmesESalas() {
+          const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+          const salas = JSON.parse(localStorage.getItem('salas')) || [];
+      
+          const selectFilme = document.getElementById('nome-filme');
+          const selectSala = document.getElementById('nome-sala');
+      
+          selectFilme.innerHTML = '<option value="" selected disabled>Escolha o filme</option>';
+          selectSala.innerHTML = '<option value="" selected disabled>Escolha a sala</option>';
+      
+          filmes.forEach(filme => {
+            const option = document.createElement('option');
+            option.value = filme.id;
+            option.textContent = filme.titulo;
+            selectFilme.appendChild(option);
+          });
+      
+          salas.forEach(sala => {
+            const option = document.createElement('option');
+            option.value = sala.id;
+            option.textContent = sala.nome;
+            selectSala.appendChild(option);
+          });
+        }
+      
+        $('#exampleModal').on('show.bs.modal', carregarFilmesESalas);
+      
+        document.getElementById('form-sessao').addEventListener('submit', function(event) {
+          event.preventDefault();
+      
+          const filmeId = document.getElementById('nome-filme').value;
+          const salaId = document.getElementById('nome-sala').value;
+          const dataHora = document.getElementById('data-time').value;
+          const preco = document.getElementById('preco').value;
+          const idioma = document.getElementById('idioma').value;
+          const formato = document.getElementById('formato').value;
+      
+          let sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+      
+          if (idSessaoEdicao) {
+            // Atualizar
+            sessoes = sessoes.map(sessao =>
+              sessao.id === idSessaoEdicao
+                ? { ...sessao, filmeId, salaId, dataHora, preco, idioma, formato }
+                : sessao
+            );
+            alert('Sessão atualizada com sucesso!');
+          } else {
+            // Criar
+            const novaSessao = {
+              id: Date.now(),
+              filmeId,
+              salaId,
+              dataHora,
+              preco,
+              idioma,
+              formato
+            };
+            sessoes.push(novaSessao);
+            alert('Sessão cadastrada com sucesso!');
+          }
+      
+          localStorage.setItem('sessoes', JSON.stringify(sessoes));
+          idSessaoEdicao = null;
+          this.reset();
+          $('#exampleModal').modal('hide');
+          carregarTabelaSessoes();
+        });
+      
+        function carregarTabelaSessoes() {
+          const tbody = document.querySelector('#tabela-sessoes tbody');
+          tbody.innerHTML = '';
+      
+          const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+          const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+          const salas = JSON.parse(localStorage.getItem('salas')) || [];
+      
+          sessoes.forEach(sessao => {
+            const filme = filmes.find(f => f.id == sessao.filmeId);
+            const sala = salas.find(s => s.id == sessao.salaId);
+      
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${sessao.id}</td>
+              <td>${filme?.titulo || 'Desconhecido'}</td>
+              <td>${sala?.nome || 'Desconhecida'}</td>
+              <td>${new Date(sessao.dataHora).toLocaleString()}</td>
+              <td>R$ ${Number(sessao.preco).toFixed(2)}</td>
+              <td>${sessao.idioma}</td>
+              <td>${sessao.formato}</td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="editarSessao(${sessao.id})">Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="excluirSessao(${sessao.id})">Excluir</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      
+        function editarSessao(id) {
+          const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+          const sessao = sessoes.find(s => s.id === id);
+          if (!sessao) return;
+      
+          idSessaoEdicao = id;
+      
+          document.getElementById('nome-filme').value = sessao.filmeId;
+          document.getElementById('nome-sala').value = sessao.salaId;
+          document.getElementById('data-time').value = sessao.dataHora;
+          document.getElementById('preco').value = sessao.preco;
+          document.getElementById('idioma').value = sessao.idioma;
+          document.getElementById('formato').value = sessao.formato;
+      
+          $('#exampleModal').modal('show');
+        }
+      
+        function excluirSessao(id) {
+          if (confirm('Tem certeza que deseja excluir esta sessão?')) {
+            const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+            const novas = sessoes.filter(s => s.id !== id);
+            localStorage.setItem('sessoes', JSON.stringify(novas));
+            carregarTabelaSessoes();
+          }
+        }
+      
+        window.onload = carregarTabelaSessoes;
+      </script>
+        
+</body>
 </html>

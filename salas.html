@@ -22,7 +22,7 @@
 
     <main>
       <br>
-      <h1 style="text-align: center;">Cadastrar Salas</h1>
+      <h1 style="text-align: center;">Salas</h1>
       <hr>
 
       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Cadastrar Sala</button>
@@ -37,7 +37,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form>
+              <form id="form-sala">
                 <div class="form-group">
                   <label for="nome-sala" class="col-form-label">Nome da Sala:</label>
                   <input type="text" class="form-control" id="nome-sala" name="nome-sala" required>
@@ -64,11 +64,116 @@
           </div>
         </div>
       </div>
+
+      <hr>
+
+      <br>
+<h3>Salas Cadastradas</h3>
+<table class="table table-bordered table-striped" id="tabela-salas">
+  <thead class="thead-dark">
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Capacidade</th>
+      <th>Tipo</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
     </main>
 
     <footer></footer>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    
+    <script>
+      const formSala = document.getElementById('form-sala');
+      const tabelaSalas = document.querySelector('#tabela-salas tbody');
+      let idSalaEdicao = null;
+    
+      function carregarSalas() {
+        tabelaSalas.innerHTML = '';
+        const salas = JSON.parse(localStorage.getItem('salas')) || [];
+    
+        salas.forEach(sala => {
+          const tr = document.createElement('tr');
+    
+          tr.innerHTML = `
+            <td>${sala.id}</td>
+            <td>${sala.nome}</td>
+            <td>${sala.capacidade}</td>
+            <td>${sala.tipo}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editarSala(${sala.id})">Editar</button>
+              <button class="btn btn-sm btn-danger" onclick="excluirSala(${sala.id})">Excluir</button>
+            </td>
+          `;
+          tabelaSalas.appendChild(tr);
+        });
+      }
+    
+      formSala.addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        const nome = document.getElementById('nome-sala').value;
+        const capacidade = document.getElementById('capacidade').value;
+        const tipo = document.getElementById('tipo').value;
+    
+        let salas = JSON.parse(localStorage.getItem('salas')) || [];
+    
+        if (idSalaEdicao) {
+          // Atualizar sala existente
+          salas = salas.map(sala =>
+            sala.id === idSalaEdicao
+              ? { ...sala, nome, capacidade, tipo }
+              : sala
+          );
+          alert('Sala atualizada com sucesso!');
+        } else {
+          // Nova sala
+          const novaSala = {
+            id: Date.now(),
+            nome,
+            capacidade,
+            tipo
+          };
+          salas.push(novaSala);
+          alert('Sala cadastrada com sucesso!');
+        }
+    
+        localStorage.setItem('salas', JSON.stringify(salas));
+        idSalaEdicao = null;
+        this.reset();
+        $('#exampleModal').modal('hide');
+        carregarSalas();
+      });
+    
+      function editarSala(id) {
+        const salas = JSON.parse(localStorage.getItem('salas')) || [];
+        const sala = salas.find(s => s.id === id);
+        if (!sala) return;
+    
+        document.getElementById('nome-sala').value = sala.nome;
+        document.getElementById('capacidade').value = sala.capacidade;
+        document.getElementById('tipo').value = sala.tipo;
+    
+        idSalaEdicao = id;
+        $('#exampleModal').modal('show');
+      }
+    
+      function excluirSala(id) {
+        if (confirm('Tem certeza que deseja excluir esta sala?')) {
+          const salas = JSON.parse(localStorage.getItem('salas')) || [];
+          const novas = salas.filter(s => s.id !== id);
+          localStorage.setItem('salas', JSON.stringify(novas));
+          carregarSalas();
+        }
+      }
+    
+      window.onload = carregarSalas;
+    </script>
+    
   </body>
 </html>

@@ -22,7 +22,7 @@
 
     <main>
       <br>
-      <h1 style="text-align: center;">Cadastrar Filmes</h1>
+      <h1 style="text-align: center;">Filmes</h1>
       <hr>
 
       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Cadastrar Filme</button>
@@ -37,7 +37,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form>
+              <form id="form-filme">
                 <div class="form-group">
                   <label for="titulo" class="col-form-label">Título:</label>
                   <input type="text" class="form-control" id="titulo" name="titulo" required>
@@ -83,11 +83,134 @@
           </div>
         </div>
       </div>
+
+      <hr>
+
+      <br>
+      <h3>Filmes Cadastrados</h3>
+      <table class="table table-bordered table-striped" id="tabela-filmes">
+        <thead class="thead-dark">
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Gênero</th>
+            <th>Classificação</th>
+            <th>Duração</th>
+            <th>Data de Estreia</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </main>
 
     <footer></footer>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    
+    <script>
+      let idEdicao = null;
+
+      const form = document.getElementById('form-filme');
+      const tabela = document.querySelector('#tabela-filmes tbody');
+    
+      function carregarFilmes() {
+        tabela.innerHTML = '';
+        const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+    
+        filmes.forEach(filme => {
+          const tr = document.createElement('tr');
+    
+          tr.innerHTML = `
+            <td>${filme.id}</td>
+            <td>${filme.titulo}</td>
+            <td>${filme.genero}</td>
+            <td>${filme.classificacao}</td>
+            <td>${filme.duracao} min</td>
+            <td>${filme.dataEstreia}</td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editarFilme(${filme.id})">Editar</button>
+              <button class="btn btn-sm btn-danger" onclick="excluirFilme(${filme.id})">Excluir</button>
+            </td>
+          `;
+          tabela.appendChild(tr);
+        });
+      }
+    
+      form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const titulo = document.getElementById('titulo').value;
+  const descricao = document.getElementById('descricao').value;
+  const genero = document.getElementById('genero').value;
+  const classificacao = document.getElementById('classificacao').value;
+  const duracao = document.getElementById('duracao').value;
+  const dataEstreia = document.getElementById('data-de-estreia').value;
+
+  let filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+
+  if (idEdicao) {
+    // Atualizar filme existente
+    filmes = filmes.map(filme =>
+      filme.id === idEdicao
+        ? { ...filme, titulo, descricao, genero, classificacao, duracao, dataEstreia }
+        : filme
+    );
+    alert('Filme atualizado com sucesso!');
+  } else {
+    // Novo filme
+    const novoFilme = {
+      id: Date.now(),
+      titulo,
+      descricao,
+      genero,
+      classificacao,
+      duracao,
+      dataEstreia
+    };
+    filmes.push(novoFilme);
+    alert('Filme cadastrado com sucesso!');
+  }
+
+  localStorage.setItem('filmes', JSON.stringify(filmes));
+  idEdicao = null;
+  this.reset();
+  $('#exampleModal').modal('hide');
+  carregarFilmes();
+});
+    
+      function excluirFilme(id) {
+        if (confirm('Tem certeza que deseja excluir este filme?')) {
+          const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+          const novosFilmes = filmes.filter(f => f.id !== id);
+          localStorage.setItem('filmes', JSON.stringify(novosFilmes));
+          carregarFilmes();
+        }
+      }
+    
+      function editarFilme(id) {
+        const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+        const filme = filmes.find(f => f.id === id);
+
+        if (!filme) return;
+
+      // Preenche os campos do modal
+      document.getElementById('titulo').value = filme.titulo;
+      document.getElementById('descricao').value = filme.descricao;
+      document.getElementById('genero').value = filme.genero;
+      document.getElementById('classificacao').value = filme.classificacao;
+      document.getElementById('duracao').value = filme.duracao;
+      document.getElementById('data-de-estreia').value = filme.dataEstreia;
+
+      idEdicao = id;
+
+      $('#exampleModal').modal('show');
+      }
+    
+      // Carrega a tabela ao abrir a página
+      window.onload = carregarFilmes;
+    </script>
+    
   </body>
 </html>
