@@ -23,7 +23,7 @@
     <main>
       <div class="container">
         <br>
-      <h1 style="text-align: center;">Filmes</h1>
+      <h1>Filmes</h1>
       <hr>
 
       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Adicionar Filme</button>
@@ -82,6 +82,8 @@
                   <label for="data-de-estreia" class="col-form-label">Data de estreia:</label>
                   <input type="date" class="form-control" id="data-de-estreia" name="data-de-estreia" required>
                 </div>
+                  <label for="capa" class="col-form-label">URL da Imagem da Capa:</label>
+                  <input type="url" class="form-control" id="capa" name="capa">
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                     <button type="submit" class="btn btn-primary">Salvar Filme</button>
@@ -112,7 +114,6 @@
       </div>
     </main>
 
-    <footer></footer>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
@@ -167,6 +168,7 @@
     );
     alert('Filme atualizado com sucesso!');
   } else {
+    const capa = document.getElementById('capa').value;
     // Novo filme
     const novoFilme = {
       id: Date.now(),
@@ -175,7 +177,8 @@
       genero,
       classificacao,
       duracao,
-      dataEstreia
+      dataEstreia,
+      capa
     };
     filmes.push(novoFilme);
     alert('Filme cadastrado com sucesso!');
