@@ -8,15 +8,30 @@
   </head>
   <body>
     <header class="container-fluid bg-dark">
-      <nav class="nav justify-content-between d-flex">
-        <a class="navbar-brand" href="./home.html">🎬CineFilmes</a>
-        <ul class="nav ml-auto">
-          <li class="nav-item"> <a class="nav-link"  href="./salas.html">Cadastro de Salas</a></li>
-          <li class="nav-item"> <a class="nav-link"  href="./filmes.html"> Cadastro de Filmes</a></li>
-          <li class="nav-item"> <a class="nav-link"  href="./cadastro-sessoes.html">Cadastro de Sessões</a></li>
-          <li class="nav-item"> <a class="nav-link"  href="./ingressos.html">Venda de Ingressos</a></li>
-          <li class="nav-item"> <a class="nav-link"  href="./sessoes.html">Sessões Disponíveis</a></li>
-        </ul>
+      <nav class="navbar navbar-expand-md navbar-dark container">
+        <a class="navbar-brand" href="./home.html">🎬 CineFilmes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="./salas.html">Cadastro de Salas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./filmes.html">Cadastro de Filmes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./cadastro-sessoes.html">Cadastro de Sessões</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./ingressos.html">Venda de Ingressos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./sessoes.html">Sessões Disponíveis</a>
+            </li>
+          </ul>
+        </div>
       </nav>
     </header>
 
@@ -97,20 +112,23 @@
         <hr>
 
         <h3>Filmes Cadastrados</h3>
-      <table class="table table-bordered table-striped" id="tabela-filmes">
-        <thead class="thead-dark">
-          <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Gênero</th>
-            <th>Classificação</th>
-            <th>Duração</th>
-            <th>Data de Estreia</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+          
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped" id="tabela-filmes">
+            <thead class="thead-dark">
+              <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Gênero</th>
+                <th>Classificação</th>
+                <th>Duração</th>
+                <th>Data de Estreia</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div> 
       </div>
     </main>
 
