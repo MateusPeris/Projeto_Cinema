@@ -1,4 +1,3 @@
-
 # Usa uma imagem oficial do Nginx
 FROM nginx:alpine
 
