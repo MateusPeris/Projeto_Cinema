@@ -21,7 +21,8 @@
     </header>
 
     <main>
-      <br>
+      <div class="container">
+        <br>
       <h1>Ingressos</h1>
       <hr>
 
@@ -61,7 +62,7 @@
                   <label for="pagamento" class="col-form-label">Tipo de Pagamento:</label>
                   <select class="form-control" name="pagamento" id="pagamento" required>
                     <option value="" selected disabled>Esolha o tipo de pagamento</option>
-                    <option value="cartao">Cartão</option>
+                    <option value="Cartão">Cartão</option>
                     <option value="Pix">Pix</option>
                     <option value="Dinheiro">Dinheiro</option>
                   </select>
@@ -76,44 +77,62 @@
           </div>
         </div>
       </div>
+
+      <br><br>
+      <h3>Ingressos Vendidos</h3>
+      <table class="table table-bordered table-striped" id="tabela-ingressos">
+        <thead class="thead-dark">
+          <tr>
+            <th>Sessão</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Assento</th>
+            <th>Pagamento</th>
+          </tr>
+        </thead>
+      <tbody></tbody>
+    </table>
+    </div>
+
+    
     </main>
 
     <footer></footer>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script>
-      // Carregar sessões do localStorage no select
-      function carregarSessoes() {
-  const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
-  const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
-  const salas = JSON.parse(localStorage.getItem('salas')) || [];
-
-  const selectSessao = document.getElementById('sessao');
-  selectSessao.innerHTML = '<option value="" selected disabled>Escolha a sessão</option>';
-
-  sessoes.forEach(sessao => {
-    const filme = filmes.find(f => f.id == sessao.filmeId);
-    const sala = salas.find(s => s.id == sessao.salaId);
-
-    const option = document.createElement('option');
-    option.value = sessao.id;
-    option.textContent = `${filme?.titulo || 'Filme'} - ${sala?.nome || 'Sala'} - ${new Date(sessao.dataHora).toLocaleString()}`;
-    selectSessao.appendChild(option);
-  });
-
-  // Se veio uma sessão pela URL, pré-seleciona
-  const params = new URLSearchParams(window.location.search);
-  const sessaoId = params.get('sessao');
-  if (sessaoId) {
-    selectSessao.value = sessaoId;
-  }
-}
     
-      // Preencher sessões quando a modal for aberta
+    <script>
+      // Exibir sessões no select
+      function carregarSessoes() {
+        const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+        const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+        const salas = JSON.parse(localStorage.getItem('salas')) || [];
+    
+        const select = document.getElementById('sessao');
+        select.innerHTML = '<option value="" selected disabled>Escolha a sessão</option>';
+    
+        sessoes.forEach(sessao => {
+          const filme = filmes.find(f => f.id == sessao.filmeId);
+          const sala = salas.find(s => s.id == sessao.salaId);
+          const option = document.createElement('option');
+          option.value = sessao.id;
+          option.textContent = `${filme?.titulo} - ${sala?.nome} - ${new Date(sessao.dataHora).toLocaleString()}`;
+          select.appendChild(option);
+        });
+    
+        // Se veio via URL
+        const params = new URLSearchParams(window.location.search);
+        const sessaoId = params.get('sessao');
+        if (sessaoId) {
+          select.value = sessaoId;
+        }
+      }
+    
+      // Preencher sessões ao abrir modal
       $('#exampleModal').on('show.bs.modal', carregarSessoes);
     
-      // Salvar ingresso no localStorage
+      // Submeter formulário
       document.getElementById('form-ingresso').addEventListener('submit', function(event) {
         event.preventDefault();
     
@@ -122,18 +141,69 @@
           sessaoId: document.getElementById('sessao').value,
           nome: document.getElementById('nome').value,
           cpf: document.getElementById('cpf').value,
-          assento: document.getElementById('assento').value,
+          assento: document.getElementById('assento').value.toUpperCase(),
           pagamento: document.getElementById('pagamento').value
         };
     
         const ingressos = JSON.parse(localStorage.getItem('ingressos')) || [];
+    
+        // Verifica duplicidade de assento
+        const duplicado = ingressos.find(i => i.sessaoId === ingresso.sessaoId && i.assento === ingresso.assento);
+        if (duplicado) {
+          alert('Esse assento já foi vendido para essa sessão!');
+          return;
+        }
+    
         ingressos.push(ingresso);
         localStorage.setItem('ingressos', JSON.stringify(ingressos));
-    
+        // Alerta nativo + fechar modal
         alert('Ingresso comprado com sucesso!');
-        this.reset();
         $('#exampleModal').modal('hide');
+        this.reset();
+
+      carregarTabelaIngressos();
+        
       });
+    
+      function carregarTabelaIngressos() {
+        const tabela = document.querySelector('#tabela-ingressos tbody');
+        tabela.innerHTML = '';
+    
+        const ingressos = JSON.parse(localStorage.getItem('ingressos')) || [];
+        const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+        const filmes = JSON.parse(localStorage.getItem('filmes')) || [];
+        const salas = JSON.parse(localStorage.getItem('salas')) || [];
+    
+        ingressos.forEach(ingresso => {
+          const sessao = sessoes.find(s => s.id == ingresso.sessaoId);
+          const filme = filmes.find(f => f.id == sessao?.filmeId);
+          const sala = salas.find(s => s.id == sessao?.salaId);
+    
+          const linha = document.createElement('tr');
+          linha.innerHTML = `
+            <td>${filme?.titulo || ''} - ${sala?.nome || ''} - ${new Date(sessao?.dataHora).toLocaleString()}</td>
+            <td>${ingresso.nome}</td>
+            <td>${ingresso.cpf}</td>
+            <td>${ingresso.assento}</td>
+            <td>${ingresso.pagamento}</td>
+          `;
+          tabela.appendChild(linha);
+        });
+      }
+    
+      window.onload = function () {
+  carregarTabelaIngressos();
+
+  // Se veio com ?sessao=, abre o modal automaticamente
+  const params = new URLSearchParams(window.location.search);
+  const sessaoId = params.get('sessao');
+
+  if (sessaoId) {
+    $('#exampleModal').modal('show');
+  }
+};
+
+
     </script>
     
   </body>

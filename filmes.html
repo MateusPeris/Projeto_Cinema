@@ -21,11 +21,12 @@
     </header>
 
     <main>
-      <br>
+      <div class="container">
+        <br>
       <h1 style="text-align: center;">Filmes</h1>
       <hr>
 
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Cadastrar Filme</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Adicionar Filme</button>
 
       <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -50,8 +51,15 @@
                   <label for="genero" class="col-form-label">Gênero:</label>
                   <select class="form-control" name="genero" id="genero" required>
                     <option value="" selected disabled>Esolha o gênero</option>
-                    <option value="m">masculino</option>
-                    <option value="f">feminino</option>
+                    <option value="acao">Ação</option>
+                    <option value="comédia">Comédia</option>
+                    <option value="suspense">Suspense</option>
+                    <option value="terros">Terror</option>
+                    <option value="romance">Romance</option>
+                    <option value="ficcao cientifica">Ficção Científica</option>
+                    <option value="drama">Drama</option>
+                    <option value="documentario">Documentário</option>
+                    <option value="musical">Musical</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -74,20 +82,19 @@
                   <label for="data-de-estreia" class="col-form-label">Data de estreia:</label>
                   <input type="date" class="form-control" id="data-de-estreia" name="data-de-estreia" required>
                 </div>
-                <div class="modal-footer">
-                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                 <button type="submit" class="btn btn-primary">Salvar Filme</button>
-                </div>
-              </form>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Filme</button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <hr>
+        <hr>
 
-      <br>
-      <h3>Filmes Cadastrados</h3>
+        <h3>Filmes Cadastrados</h3>
       <table class="table table-bordered table-striped" id="tabela-filmes">
         <thead class="thead-dark">
           <tr>
@@ -102,6 +109,7 @@
         </thead>
         <tbody></tbody>
       </table>
+      </div>
     </main>
 
     <footer></footer>
